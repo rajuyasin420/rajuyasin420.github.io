@@ -1,32 +1,35 @@
 # OCR A-level Chemistry: Molecular Shapes Tutor
 
-A short, visual personal-tutor lesson on molecular shapes, electron-pair repulsion and bond angles.
+A visual, spoken personal-tutor lesson on molecular shapes, electron-pair repulsion and bond angles.
 
-## Built with an existing open-source animation engine
+## Built from an existing open-source project
 
-This project uses [Manim Community](https://github.com/ManimCommunity/manim), with molecular diagrams drawn directly in Manim so the build does not depend on a fragile chemistry-plugin API. The lesson is written for OCR A-level Chemistry and covers electron domains, lone-pair repulsion, shapes and angles, followed by retrieval questions.
+This uses the existing [Manim Community animation engine](https://github.com/ManimCommunity/manim). GitHub Actions renders the animation and generates a UK-English tutor voice track using Edge TTS, then muxes narration into the MP4. No paid API key is required.
+
+## Get the video
+
+Open the repository's **Actions** tab, select **Render OCR Chemistry Tutor Video**, then open the latest successful run and download the `ocr-molecular-shapes-tutor` artifact. The artifact contains the narrated MP4. Runs are also triggered when the lesson source changes.
+
+## Lesson contents
+
+- Electron-pair repulsion and the relative strength of lone-pair repulsion.
+- Linear CO₂ — 180°.
+- Trigonal planar BF₃ — 120°.
+- Tetrahedral CH₄ — 109.5°.
+- Trigonal pyramidal NH₃ — approximately 107°.
+- Bent H₂O — approximately 104.5°.
+- An OCR-style answer structure and retrieval questions with pauses before the answer reveal.
+
+The molecule diagrams are schematic projections for teaching; they are not intended as precise 3D molecular models. This is an independent study aid, not an official OCR resource. Check your current OCR specification and teacher's guidance for the exact assessed scope.
 
 ## Render locally
 
 Install Manim and its system dependencies using the official guide: https://docs.manim.community/en/stable/installation.html
 
 ```bash
-python -m pip install manim
-manim -p -qh tutor.py MolecularShapesTutor
+python -m pip install "manim>=0.18,<0.20" edge-tts
+manim -qh tutor.py MolecularShapesTutor
+python narration.py
 ```
 
-The MP4 is written under `media/videos/tutor/1080p60/`.
-
-## Render on GitHub
-
-Open **Actions → Render OCR Chemistry Tutor Video → Run workflow**. When the workflow completes, download the `ocr-molecular-shapes-tutor` artifact. GitHub Actions is used to render the video; no API key is required.
-
-## Lesson scope
-
-- Electron pairs repel and arrange themselves as far apart as possible.
-- Bonding pairs and lone pairs; lone pairs repel more strongly.
-- Linear (180°), trigonal planar (120°), tetrahedral (109.5°), trigonal pyramidal (about 107°), and bent water (about 104.5°).
-- Exam answer structure: state shape, state angle, explain repulsion and lone-pair distortion.
-- Quick recall questions with answers revealed after thinking time.
-
-The video uses on-screen tutor narration/captions. It does not claim to be an official OCR resource; check your current OCR specification and teacher's guidance for the exact assessed scope.
+The rendered MP4 is written under `media/videos/tutor/1080p60/`.
