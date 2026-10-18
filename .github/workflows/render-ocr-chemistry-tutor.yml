@@ -1,0 +1,53 @@
+name: Render OCR Chemistry Tutor Video
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "chemistry-tutor/**"
+      - ".github/workflows/render-ocr-chemistry-tutor.yml"
+  push:
+    paths:
+      - "chemistry-tutor/**"
+      - ".github/workflows/render-ocr-chemistry-tutor.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg libcairo2-dev libpango1.0-dev pkg-config
+      - name: Install Manim and text-to-speech
+        run: python -m pip install "manim>=0.18,<0.20" edge-tts
+      - name: Render lesson visuals
+        run: manim -qh chemistry-tutor/tutor.py MolecularShapesTutor
+      - name: Generate spoken UK-English tutor narration
+        run: python chemistry-tutor/narration.py
+      - name: Mux narration into the video
+        run: |
+          INPUT="media/videos/tutor/1080p60/MolecularShapesTutor.mp4"
+          ffmpeg -y -i "$INPUT" -i chemistry-tutor/narration.mp3 \
+            -vf "tpad=stop_mode=clone:stop_duration=180" \
+            -map 0:v:0 -map 1:a:0 -c:v libx264 -preset medium -crf 20 \
+            -c:a aac -b:a 192k -shortest -movflags +faststart \
+            media/videos/tutor/1080p60/MolecularShapesTutor-narrated.mp4
+          mv media/videos/tutor/1080p60/MolecularShapesTutor-narrated.mp4 "$INPUT"
+      - name: Upload narrated MP4
+        uses: actions/upload-artifact@v4
+        with:
+          name: ocr-molecular-shapes-tutor
+          path: media/videos/tutor/1080p60/MolecularShapesTutor.mp4
+          if-no-files-found: error
+          retention-days: 14
